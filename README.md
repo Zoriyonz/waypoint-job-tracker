@@ -17,6 +17,7 @@ Waypoint runs entirely in the browser with no account and no API key. Add an Ant
 - [Overview](#overview)
 - [Features](#features)
 - [Architecture](#architecture)
+- [The Chrome extension](#the-chrome-extension)
 - [How the score works](#how-the-score-works)
 - [Tech stack](#tech-stack)
 - [Project structure](#project-structure)
@@ -33,6 +34,8 @@ Waypoint runs entirely in the browser with no account and no API key. Add an Ant
 ## Overview
 
 Job searching generates a pile of postings and one resume. The useful question for each posting is "how well do I match, and what is missing?" Waypoint answers it with a transparent, deterministic scoring engine instead of a black box, and keeps your applications on a kanban board so you can see where each one stands.
+
+Waypoint is a Turborepo monorepo with **two apps on one engine**: the [web board](#architecture) and a [Chrome extension](#the-chrome-extension) that scores whatever posting you have open. Both call the same `match-engine` and `ai` packages.
 
 ## Features
 
@@ -51,6 +54,11 @@ flowchart LR
         UI[apps/web<br/>Next.js UI] -->|instant scoring| ME[packages/match-engine<br/>pure TypeScript]
         UI --> LS[(localStorage<br/>applications, resume)]
     end
+    subgraph Chrome
+        X[apps/extension<br/>MV3 popup + injected extractor] -->|score page| ME
+        X -->|offline letter draft| L
+        X --> CS[(chrome.storage.local<br/>resume)]
+    end
     UI -->|letter request only| API[POST /api/letter]
     API --> AI[packages/ai<br/>provider abstraction]
     AI --> K{ANTHROPIC_API_KEY?}
@@ -61,7 +69,9 @@ flowchart LR
 
 ```
 waypoint/
-├── apps/web                  Next.js 16 (App Router), React 19, Tailwind v4
+├── apps/
+│   ├── web                   Next.js 16 (App Router), React 19, Tailwind v4
+│   └── extension             Manifest V3 Chrome extension, bundled with esbuild
 └── packages/
     ├── match-engine          Pure TypeScript scoring engine (no dependencies)
     └── ai                    Provider abstraction: offline engine or Anthropic API
@@ -69,7 +79,29 @@ waypoint/
 
 - **`match-engine`** is framework-free and fully unit tested. It extracts skills from a curated taxonomy, splits required from nice-to-have, computes cosine similarity with sublinear term frequency, and counts quantified achievements.
 - **`ai`** defines an `AIProvider` interface. The Anthropic provider is used only when `ANTHROPIC_API_KEY` is set, and any failure degrades gracefully to the offline provider.
+- **`apps/extension`** reads the job posting in the active tab and scores it with the same engine, locally.
 - **`apps/web`** calls the engine directly in the browser for instant scoring, and calls `/api/letter` only for letter generation, so the key never reaches the client.
+
+### Why a monorepo
+
+- **One scoring engine, two products.** A posting scores identically on the board and in the extension because both import `@waypoint/match-engine`. There is no second implementation to drift.
+- **Shared letter logic.** The extension's cover letter draft uses the same offline provider as the web app, so it only ever mentions skills found in the resume.
+- **Different runtimes, one toolchain.** A Next.js app and a browser extension are linted, type-checked, tested and built by the same `pnpm` and Turborepo commands in one CI job.
+
+## The Chrome extension
+
+Open a job posting, click the Waypoint icon, and get a score, the required and nice-to-have skills you show or lack, and suggestions. Optionally copy an offline cover letter draft.
+
+```bash
+pnpm --filter @waypoint/extension build
+# then chrome://extensions → enable Developer mode → Load unpacked → apps/extension/dist
+```
+
+- **Minimal permissions.** `activeTab`, `scripting` and `storage` only: no host permissions, no always-on content script, no background worker. The extractor is injected only when you click the icon.
+- **Local only.** Your resume is stored in `chrome.storage.local`. The extension makes no network requests and has no API key; the cover letter draft is the offline provider.
+- **Reads postings robustly.** It tries the page's schema.org `JobPosting` data first, then known applicant-tracking-system containers, then the page text, and tells you which was used so you know how much to trust the score.
+- **Treats pages as untrusted.** Descriptions are parsed with `DOMParser` (an inert document) and rendered with `textContent`, so markup in a posting can never run or load anything. This is covered by tests.
+- **Verified in a real browser.** Besides 26 unit tests, the built extension was loaded into Chrome and driven end to end (save resume, reload, score a posting).
 
 ## How the score works
 
@@ -102,11 +134,16 @@ The weights are heuristics, not a prediction of hiring outcomes. Treat the score
 
 ```
 waypoint-job-tracker/
-├── apps/web/
-│   └── src/
-│       ├── app/                 Pages: / and /board, and POST /api/letter
-│       ├── components/          Board, JobDrawer, ScoreRing
-│       └── lib/                 store (local-first state), seed data, types
+├── apps/
+│   ├── web/
+│   │   └── src/
+│   │       ├── app/             Pages: / and /board, and POST /api/letter
+│   │       ├── components/      Board, JobDrawer, ScoreRing
+│   │       └── lib/             store (local-first state), seed data, types
+│   └── extension/
+│       ├── public/              manifest.json, popup.html, popup.css, icons
+│       ├── src/                 extract.ts (page reader), popup.ts (UI), content.ts, chromeApi.ts
+│       └── scripts/build.mjs    esbuild bundle into dist/
 ├── packages/
 │   ├── match-engine/src/        analyze, skills taxonomy, text helpers (+ tests)
 │   └── ai/src/                  providers: local and anthropic (+ tests)
@@ -146,19 +183,19 @@ cp apps/web/.env.example apps/web/.env.local
 
 Run from the repository root.
 
-| Command             | What it does                                   |
-| ------------------- | ---------------------------------------------- |
-| `pnpm dev`          | Start the web app                              |
-| `pnpm build`        | Build everything through Turborepo             |
-| `pnpm lint`         | ESLint                                         |
-| `pnpm typecheck`    | `tsc --noEmit` in every package                |
-| `pnpm test`         | Unit tests for both packages                   |
-| `pnpm format`       | Format everything with Prettier                |
-| `pnpm format:check` | Fail if anything is not formatted (used in CI) |
+| Command             | What it does                                    |
+| ------------------- | ----------------------------------------------- |
+| `pnpm dev`          | Start the web app                               |
+| `pnpm build`        | Build everything through Turborepo              |
+| `pnpm lint`         | ESLint (web and extension)                      |
+| `pnpm typecheck`    | `tsc --noEmit` in every package                 |
+| `pnpm test`         | Unit tests for all packages and apps (41 total) |
+| `pnpm format`       | Format everything with Prettier                 |
+| `pnpm format:check` | Fail if anything is not formatted (used in CI)  |
 
 ## Testing and quality gates
 
-15 unit tests run offline. The match engine's 10 tests cover alias-based skill extraction, no matches inside other words, symbol skills like C++ and C#, required versus nice-to-have splitting, matched and missing skills, score bounds and ordering (a better resume scores higher), evidence suggestions for missing skills, neutral scoring when a posting names no skills, cosine similarity edge cases and quantified-achievement counting. The AI package's 5 tests cover provider selection, letters that only claim skills found in the resume, and fallback to the offline provider when the hosted API fails.
+41 tests run offline: 15 in the two packages and 26 in the extension. The match engine's 10 tests cover alias-based skill extraction, no matches inside other words, symbol skills like C++ and C#, required versus nice-to-have splitting, matched and missing skills, score bounds and ordering (a better resume scores higher), evidence suggestions for missing skills, neutral scoring when a posting names no skills, cosine similarity edge cases and quantified-achievement counting. The AI package's 5 tests cover provider selection, letters that only claim skills found in the resume, and fallback to the offline provider when the hosted API fails. The extension's 26 tests cover page extraction (structured data, ATS selectors, fallbacks, length caps and inert handling of hostile markup), the popup flow against an injected browser API, and manifest guarantees such as minimal permissions, no always-on scripts and a strict content security policy.
 
 CI runs `format:check`, `lint`, `typecheck`, `test` and `build` on every push and pull request.
 
