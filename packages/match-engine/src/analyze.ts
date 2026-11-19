@@ -20,7 +20,8 @@ export interface MatchResult {
 }
 
 const NICE_HEADING = /nice to have|preferred|bonus|a plus|assets?\b|good to have/i;
-const REQUIRED_HEADING = /requirements?|qualifications?|responsibilit|what you('|’)?ll|must have|you have|about you/i;
+const REQUIRED_HEADING =
+  /requirements?|qualifications?|responsibilit|what you('|’)?ll|must have|you have|about you/i;
 
 /**
  * Splits a job description's skills into "required" and "nice to have"
@@ -64,7 +65,8 @@ export function analyze(resume: string, job: string): MatchResult {
   const missingNice = nice.filter((s) => !resumeSkills.has(s));
 
   const weightTotal = required.length + nice.length * 0.5;
-  const skills = weightTotal === 0 ? 0.5 : (matchedRequired.length + matchedNice.length * 0.5) / weightTotal;
+  const skills =
+    weightTotal === 0 ? 0.5 : (matchedRequired.length + matchedNice.length * 0.5) / weightTotal;
 
   // raw cosine for resume-vs-JD prose rarely exceeds ~0.4, so rescale
   const relevance = Math.min(1, cosineSimilarity(resume, job) / 0.4);
@@ -74,15 +76,24 @@ export function analyze(resume: string, job: string): MatchResult {
 
   const suggestions: string[] = [];
   for (const s of missingRequired.slice(0, 3)) {
-    suggestions.push(`Show real evidence of ${s}: a project, coursework or a bullet that names it.`);
+    suggestions.push(
+      `Show real evidence of ${s}: a project, coursework or a bullet that names it.`,
+    );
   }
   if (impact < 0.5) {
-    suggestions.push("Quantify results (percentages, users, time saved) so bullets read as outcomes, not duties.");
+    suggestions.push(
+      "Quantify results (percentages, users, time saved) so bullets read as outcomes, not duties.",
+    );
   }
   if (relevance < 0.5) {
-    suggestions.push("Mirror the posting's language where it's truthful: reuse its domain terms in your bullets.");
+    suggestions.push(
+      "Mirror the posting's language where it's truthful: reuse its domain terms in your bullets.",
+    );
   }
-  if (suggestions.length === 0) suggestions.push("Strong alignment. Tailor your first bullet to the role's top responsibility.");
+  if (suggestions.length === 0)
+    suggestions.push(
+      "Strong alignment. Tailor your first bullet to the role's top responsibility.",
+    );
 
   return {
     score,

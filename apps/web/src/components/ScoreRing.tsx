@@ -19,9 +19,21 @@ export function ScoreRing({ value, size = 44, stroke = 4, showLabel = true }: Pr
   const color = scoreColor(value);
 
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }} role="img" aria-label={`Match score ${value} out of 100`}>
+    <div
+      className="relative shrink-0"
+      style={{ width: size, height: size }}
+      role="img"
+      aria-label={`Match score ${value} out of 100`}
+    >
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgb(255 255 255 / 0.08)" strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="rgb(255 255 255 / 0.08)"
+          strokeWidth={stroke}
+        />
         <circle
           cx={size / 2}
           cy={size / 2}

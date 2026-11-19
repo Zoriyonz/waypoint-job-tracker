@@ -2,7 +2,9 @@ import { analyze } from "@waypoint/match-engine";
 import type { AIProvider, LetterInput } from "./types";
 
 const list = (items: string[]) =>
-  items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+  items.length <= 1
+    ? (items[0] ?? "")
+    : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 
 /**
  * Deterministic, offline provider. It needs no API key, so the whole product
@@ -25,6 +27,8 @@ export const localProvider: AIProvider = {
       : `I'm comfortable owning work end to end, from first idea to production.`;
     const close = `I'd welcome the chance to talk about how I can contribute to ${company}. Thank you for your time and consideration.`;
 
-    return [`Dear ${company} hiring team,`, opening, body, learning, close, "Sincerely,"].join("\n\n");
+    return [`Dear ${company} hiring team,`, opening, body, learning, close, "Sincerely,"].join(
+      "\n\n",
+    );
   },
 };

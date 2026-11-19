@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { analyze, cosineSimilarity, countImpactSignals, extractSkills, splitJobSkills } from "./index";
+import {
+  analyze,
+  cosineSimilarity,
+  countImpactSignals,
+  extractSkills,
+  splitJobSkills,
+} from "./index";
 
 const resume = `
 Built a React and TypeScript dashboard used by 1,200 users, cutting report time by 40%.
@@ -31,7 +37,9 @@ describe("extractSkills", () => {
   });
 
   it("handles symbols like C++ and C#", () => {
-    expect(extractSkills("Proficient in C++ and C#")).toEqual(expect.arrayContaining(["C++", "C#"]));
+    expect(extractSkills("Proficient in C++ and C#")).toEqual(
+      expect.arrayContaining(["C++", "C#"]),
+    );
   });
 });
 
@@ -78,7 +86,9 @@ describe("text helpers", () => {
   });
 
   it("counts quantified achievements", () => {
-    expect(countImpactSignals("Cut latency by 40% for 1,200 users and saved $2M")).toBeGreaterThanOrEqual(3);
+    expect(
+      countImpactSignals("Cut latency by 40% for 1,200 users and saved $2M"),
+    ).toBeGreaterThanOrEqual(3);
     expect(countImpactSignals("Worked on things")).toBe(0);
   });
 });

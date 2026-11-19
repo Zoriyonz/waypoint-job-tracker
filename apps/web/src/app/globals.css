@@ -17,7 +17,13 @@ html,
 body {
   background: var(--color-ink);
   color: #e8ebf3;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -41,11 +47,21 @@ body {
 }
 
 @keyframes rise {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.rise { animation: rise 0.5s ease both; }
+.rise {
+  animation: rise 0.5s ease both;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .rise { animation: none; }
+  .rise {
+    animation: none;
+  }
 }

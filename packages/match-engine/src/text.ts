@@ -34,12 +34,15 @@ export function cosineSimilarity(a: string, b: string): number {
     const w = tb.get(k);
     if (w) dot += v * w;
   }
-  const norm = (m: Map<string, number>) => Math.sqrt([...m.values()].reduce((s, v) => s + v * v, 0));
+  const norm = (m: Map<string, number>) =>
+    Math.sqrt([...m.values()].reduce((s, v) => s + v * v, 0));
   return dot / (norm(ta) * norm(tb));
 }
 
 /** Counts quantified achievements like "40%", "$2M", "12 services", "3x". */
 export function countImpactSignals(text: string): number {
-  const matches = text.match(/(\$\s?\d[\d,.]*\s?[kmb]?\b|\b\d[\d,.]*\s?(%|x\b|k\b|m\b|ms\b|users\b|services\b|engineers\b))/gi);
+  const matches = text.match(
+    /(\$\s?\d[\d,.]*\s?[kmb]?\b|\b\d[\d,.]*\s?(%|x\b|k\b|m\b|ms\b|users\b|services\b|engineers\b))/gi,
+  );
   return matches ? matches.length : 0;
 }

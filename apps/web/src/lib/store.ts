@@ -35,9 +35,12 @@ export function useWaypoint() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Deliberate: hydrate from localStorage after mount so server and client markup match.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setApps(read<Application[]>(APPS_KEY, SEED_APPS));
     setResumeState(read<string>(RESUME_KEY, SEED_RESUME));
     setReady(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   const commit = useCallback((next: Application[]) => {
@@ -63,7 +66,10 @@ export function useWaypoint() {
     [apps, commit],
   );
 
-  const remove = useCallback((id: string) => commit(apps.filter((a) => a.id !== id)), [apps, commit]);
+  const remove = useCallback(
+    (id: string) => commit(apps.filter((a) => a.id !== id)),
+    [apps, commit],
+  );
 
   const reset = useCallback(() => {
     commit(SEED_APPS);

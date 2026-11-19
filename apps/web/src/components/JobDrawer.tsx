@@ -33,7 +33,10 @@ function Bar({ label, value }: { label: string; value: number }) {
         <span className="tabular-nums">{Math.round(value * 100)}%</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-        <div className="h-full rounded-full bg-glow transition-all duration-500" style={{ width: `${value * 100}%` }} />
+        <div
+          className="h-full rounded-full bg-glow transition-all duration-500"
+          style={{ width: `${value * 100}%` }}
+        />
       </div>
     </div>
   );
@@ -46,7 +49,13 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => setDraft(app), [app]);
+  // Reset the draft when a different application is opened (adjust state during render,
+  // the pattern React recommends instead of syncing props to state in an effect).
+  const [seenApp, setSeenApp] = useState<Application>(app);
+  if (app !== seenApp) {
+    setSeenApp(app);
+    setDraft(app);
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -55,7 +64,8 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
   }, [onClose]);
 
   const result = useMemo(() => analyze(resume, draft.description), [resume, draft.description]);
-  const set = <K extends keyof Application>(k: K, v: Application[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const set = <K extends keyof Application>(k: K, v: Application[K]) =>
+    setDraft((d) => ({ ...d, [k]: v }));
 
   async function writeLetter() {
     setBusy(true);
@@ -92,15 +102,30 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
   const canSave = draft.company.trim() && draft.role.trim();
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label="Application details">
-      <button aria-label="Close" className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+    <div
+      className="fixed inset-0 z-40 flex justify-end"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Application details"
+    >
+      <button
+        aria-label="Close"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
       <aside className="rise relative flex h-full w-full max-w-xl flex-col overflow-y-auto border-l border-line bg-panel p-6">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-widest text-mute">{isNew ? "New application" : "Application"}</p>
+            <p className="text-xs uppercase tracking-widest text-mute">
+              {isNew ? "New application" : "Application"}
+            </p>
             <h2 className="font-display text-2xl">{draft.company || "Untitled"}</h2>
           </div>
-          <button onClick={onClose} className="rounded-md px-2 py-1 text-mute hover:bg-white/5 hover:text-white" aria-label="Close panel">
+          <button
+            onClick={onClose}
+            className="rounded-md px-2 py-1 text-mute hover:bg-white/5 hover:text-white"
+            aria-label="Close panel"
+          >
             ✕
           </button>
         </div>
@@ -121,7 +146,9 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
               <p className="mb-1.5 text-xs text-mute">You have</p>
               <div className="flex flex-wrap gap-1.5">
                 {[...result.matchedRequired, ...result.matchedNice].map((s) => (
-                  <Chip key={s} tone="good">{s}</Chip>
+                  <Chip key={s} tone="good">
+                    {s}
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -131,40 +158,79 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
               <p className="mb-1.5 text-xs text-mute">Gaps</p>
               <div className="flex flex-wrap gap-1.5">
                 {result.missingRequired.map((s) => (
-                  <Chip key={s} tone="warn">{s}</Chip>
+                  <Chip key={s} tone="warn">
+                    {s}
+                  </Chip>
                 ))}
                 {result.missingNice.map((s) => (
-                  <span key={s} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-mute">{s}</span>
+                  <span
+                    key={s}
+                    className="rounded-full border border-line px-2.5 py-0.5 text-xs text-mute"
+                  >
+                    {s}
+                  </span>
                 ))}
               </div>
             </div>
           )}
           <ul className="space-y-1 text-sm text-mute">
             {result.suggestions.map((s) => (
-              <li key={s} className="flex gap-2"><span className="text-glow">→</span>{s}</li>
+              <li key={s} className="flex gap-2">
+                <span className="text-glow">→</span>
+                {s}
+              </li>
             ))}
           </ul>
         </div>
 
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <label className="text-xs text-mute">Company
-              <input className={`${field} mt-1`} value={draft.company} onChange={(e) => set("company", e.target.value)} />
+            <label className="text-xs text-mute">
+              Company
+              <input
+                className={`${field} mt-1`}
+                value={draft.company}
+                onChange={(e) => set("company", e.target.value)}
+              />
             </label>
-            <label className="text-xs text-mute">Role
-              <input className={`${field} mt-1`} value={draft.role} onChange={(e) => set("role", e.target.value)} />
+            <label className="text-xs text-mute">
+              Role
+              <input
+                className={`${field} mt-1`}
+                value={draft.role}
+                onChange={(e) => set("role", e.target.value)}
+              />
             </label>
-            <label className="text-xs text-mute">Location
-              <input className={`${field} mt-1`} value={draft.location} onChange={(e) => set("location", e.target.value)} />
+            <label className="text-xs text-mute">
+              Location
+              <input
+                className={`${field} mt-1`}
+                value={draft.location}
+                onChange={(e) => set("location", e.target.value)}
+              />
             </label>
-            <label className="text-xs text-mute">Stage
-              <select className={`${field} mt-1`} value={draft.stage} onChange={(e) => set("stage", e.target.value as Stage)}>
-                {STAGES.map((s) => <option key={s} value={s}>{STAGE_LABEL[s]}</option>)}
+            <label className="text-xs text-mute">
+              Stage
+              <select
+                className={`${field} mt-1`}
+                value={draft.stage}
+                onChange={(e) => set("stage", e.target.value as Stage)}
+              >
+                {STAGES.map((s) => (
+                  <option key={s} value={s}>
+                    {STAGE_LABEL[s]}
+                  </option>
+                ))}
               </select>
             </label>
           </div>
-          <label className="block text-xs text-mute">Job description (paste it in, the score updates live)
-            <textarea className={`${field} mt-1 h-40 resize-y font-mono text-xs`} value={draft.description} onChange={(e) => set("description", e.target.value)} />
+          <label className="block text-xs text-mute">
+            Job description (paste it in, the score updates live)
+            <textarea
+              className={`${field} mt-1 h-40 resize-y font-mono text-xs`}
+              value={draft.description}
+              onChange={(e) => set("description", e.target.value)}
+            />
           </label>
         </div>
 
@@ -179,13 +245,28 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
               {busy ? "Writing…" : draft.letter ? "Regenerate" : "Draft with AI"}
             </button>
           </div>
-          {error && <p className="mb-2 text-sm text-red-300" role="alert">{error}</p>}
+          {error && (
+            <p className="mb-2 text-sm text-red-300" role="alert">
+              {error}
+            </p>
+          )}
           {draft.letter && (
             <div className="card-sheen rounded-xl border border-line p-4">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">{draft.letter}</p>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+                {draft.letter}
+              </p>
               <div className="mt-3 flex items-center justify-between text-xs text-mute">
-                <span>{provider ? `Written by ${provider === "anthropic" ? "Claude" : "the offline engine"}` : "Saved draft"}</span>
-                <button onClick={copy} className="rounded px-2 py-1 hover:bg-white/5 hover:text-white">{copied ? "Copied" : "Copy"}</button>
+                <span>
+                  {provider
+                    ? `Written by ${provider === "anthropic" ? "Claude" : "the offline engine"}`
+                    : "Saved draft"}
+                </span>
+                <button
+                  onClick={copy}
+                  className="rounded px-2 py-1 hover:bg-white/5 hover:text-white"
+                >
+                  {copied ? "Copied" : "Copy"}
+                </button>
               </div>
             </div>
           )}
@@ -193,8 +274,15 @@ export function JobDrawer({ app, resume, isNew, onSave, onDelete, onClose }: Pro
 
         <div className="mt-auto flex items-center justify-between pt-8">
           {!isNew ? (
-            <button onClick={() => onDelete(app.id)} className="text-sm text-red-300/80 hover:text-red-300">Delete</button>
-          ) : <span />}
+            <button
+              onClick={() => onDelete(app.id)}
+              className="text-sm text-red-300/80 hover:text-red-300"
+            >
+              Delete
+            </button>
+          ) : (
+            <span />
+          )}
           <button
             onClick={() => onSave(draft)}
             disabled={!canSave}

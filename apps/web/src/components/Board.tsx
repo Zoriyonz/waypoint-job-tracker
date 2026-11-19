@@ -32,22 +32,32 @@ export function Board() {
     [apps, resume],
   );
 
-  const avg = scored.length ? Math.round(scored.reduce((s, x) => s + x.score, 0) / scored.length) : 0;
+  const avg = scored.length
+    ? Math.round(scored.reduce((s, x) => s + x.score, 0) / scored.length)
+    : 0;
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-8">
       <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-display text-2xl">Waypoint</Link>
+          <Link href="/" className="font-display text-2xl">
+            Waypoint
+          </Link>
           <span className="hidden text-sm text-mute sm:inline">
             {apps.length} applications · avg match <span className="text-white">{avg}</span>
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowResume((v) => !v)} className="rounded-lg border border-line px-3 py-2 text-sm hover:bg-white/5">
+          <button
+            onClick={() => setShowResume((v) => !v)}
+            className="rounded-lg border border-line px-3 py-2 text-sm hover:bg-white/5"
+          >
             {showResume ? "Hide resume" : "Edit resume"}
           </button>
-          <button onClick={() => setOpen({ app: blank(), isNew: true })} className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-black hover:bg-slate-200">
+          <button
+            onClick={() => setOpen({ app: blank(), isNew: true })}
+            className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-black hover:bg-slate-200"
+          >
             + Add job
           </button>
         </div>
@@ -57,7 +67,9 @@ export function Board() {
         <section className="rise card-sheen mb-8 rounded-xl border border-line p-4">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm font-medium">Your resume</p>
-            <button onClick={reset} className="text-xs text-mute hover:text-white">Reset demo data</button>
+            <button onClick={reset} className="text-xs text-mute hover:text-white">
+              Reset demo data
+            </button>
           </div>
           <textarea
             value={resume}
@@ -65,7 +77,9 @@ export function Board() {
             className="h-52 w-full resize-y rounded-lg border border-line bg-black/30 p-3 font-mono text-xs outline-none focus:border-glow/60"
             aria-label="Resume text"
           />
-          <p className="mt-2 text-xs text-mute">Stored only in this browser. Every score below updates as you type.</p>
+          <p className="mt-2 text-xs text-mute">
+            Stored only in this browser. Every score below updates as you type.
+          </p>
         </section>
       )}
 
@@ -74,13 +88,22 @@ export function Board() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           {STAGES.map((stage) => {
-            const items = scored.filter((x) => x.app.stage === stage).sort((a, b) => b.score - a.score);
+            const items = scored
+              .filter((x) => x.app.stage === stage)
+              .sort((a, b) => b.score - a.score);
             return (
               <section
                 key={stage}
-                onDragOver={(e) => { e.preventDefault(); setOverStage(stage); }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setOverStage(stage);
+                }}
                 onDragLeave={() => setOverStage((s) => (s === stage ? null : s))}
-                onDrop={() => { if (dragId) move(dragId, stage); setDragId(null); setOverStage(null); }}
+                onDrop={() => {
+                  if (dragId) move(dragId, stage);
+                  setDragId(null);
+                  setOverStage(null);
+                }}
                 className={`min-h-48 rounded-xl border p-3 transition ${overStage === stage ? "border-glow/60 bg-glow/5" : "border-line bg-white/[0.015]"}`}
                 aria-label={STAGE_LABEL[stage]}
               >
@@ -93,7 +116,10 @@ export function Board() {
                       key={app.id}
                       draggable
                       onDragStart={() => setDragId(app.id)}
-                      onDragEnd={() => { setDragId(null); setOverStage(null); }}
+                      onDragEnd={() => {
+                        setDragId(null);
+                        setOverStage(null);
+                      }}
                       onClick={() => setOpen({ app, isNew: false })}
                       className="card-sheen rise flex w-full items-center gap-3 rounded-lg border border-line p-3 text-left transition hover:-translate-y-0.5 hover:border-glow/40"
                     >
@@ -104,7 +130,9 @@ export function Board() {
                       </span>
                     </button>
                   ))}
-                  {items.length === 0 && <p className="py-6 text-center text-xs text-mute/70">Drop a card here</p>}
+                  {items.length === 0 && (
+                    <p className="py-6 text-center text-xs text-mute/70">Drop a card here</p>
+                  )}
                 </div>
               </section>
             );
@@ -118,8 +146,14 @@ export function Board() {
           isNew={open.isNew}
           resume={resume}
           onClose={() => setOpen(null)}
-          onSave={(a) => { upsert(a); setOpen(null); }}
-          onDelete={(id) => { remove(id); setOpen(null); }}
+          onSave={(a) => {
+            upsert(a);
+            setOpen(null);
+          }}
+          onDelete={(id) => {
+            remove(id);
+            setOpen(null);
+          }}
         />
       )}
     </main>

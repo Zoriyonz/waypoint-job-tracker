@@ -37,7 +37,10 @@ describe("generateCoverLetter", () => {
   it("returns hosted text when the API succeeds", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ content: [{ type: "text", text: "Hello from the model" }] }) }),
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ content: [{ type: "text", text: "Hello from the model" }] }),
+      }),
     );
     const result = await generateCoverLetter(input, { ANTHROPIC_API_KEY: "test" });
     expect(result).toEqual({ letter: "Hello from the model", provider: "anthropic" });

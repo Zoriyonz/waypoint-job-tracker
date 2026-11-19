@@ -27,7 +27,10 @@ export default function Home() {
     <main className="mx-auto max-w-6xl px-6">
       <nav className="flex items-center justify-between py-6">
         <span className="font-display text-2xl">Waypoint</span>
-        <Link href="/board" className="rounded-full border border-line px-4 py-2 text-sm hover:bg-white/5">
+        <Link
+          href="/board"
+          className="rounded-full border border-line px-4 py-2 text-sm hover:bg-white/5"
+        >
           Open the board
         </Link>
       </nav>
@@ -41,11 +44,15 @@ export default function Home() {
             before you apply.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-mute">
-            Paste a job description and Waypoint scores it against your resume, shows what's missing, and drafts a
-            tailored cover letter. Everything runs in your browser, no account, no API key.
+            Paste a job description and Waypoint scores it against your resume, shows what&apos;s
+            missing, and drafts a tailored cover letter. Everything runs in your browser, no
+            account, no API key.
           </p>
           <div className="mt-8 flex gap-3">
-            <Link href="/board" className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black hover:bg-slate-200">
+            <Link
+              href="/board"
+              className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black hover:bg-slate-200"
+            >
               Try the live demo
             </Link>
             <a
@@ -61,7 +68,10 @@ export default function Home() {
           <p className="mb-4 text-xs uppercase tracking-widest text-mute">This week</p>
           <div className="space-y-3">
             {demo.map((d) => (
-              <div key={d.company} className="flex items-center gap-4 rounded-xl border border-line bg-black/20 p-3">
+              <div
+                key={d.company}
+                className="flex items-center gap-4 rounded-xl border border-line bg-black/20 p-3"
+              >
                 <ScoreRing value={d.score} size={52} />
                 <div>
                   <p className="text-sm font-medium">{d.company}</p>
@@ -83,7 +93,8 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-line py-8 text-sm text-mute">
-        Built with Next.js, TypeScript, Tailwind and a tested matching engine in a Turborepo monorepo.
+        Built with Next.js, TypeScript, Tailwind and a tested matching engine in a Turborepo
+        monorepo.
       </footer>
     </main>
   );
