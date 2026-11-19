@@ -1,0 +1,147 @@
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --line: #2a2f3a;
+  --text: #e8eaf0;
+  --mute: #9aa3b2;
+  --accent: #7c9cff;
+  --hit: #3ecf8e;
+  --miss: #ff7a7a;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  width: 380px;
+  margin: 0;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    13px/1.45 system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+h1 {
+  margin: 0;
+  font-size: 18px;
+}
+h3 {
+  margin: 14px 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.tag {
+  margin: 2px 0 12px;
+  color: var(--mute);
+}
+label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--mute);
+}
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+button {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0b0d12;
+  font-weight: 600;
+}
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+#letter {
+  width: 100%;
+  margin-top: 12px;
+}
+#status {
+  min-height: 1.4em;
+  margin: 10px 0 0;
+  color: var(--mute);
+}
+#status[data-kind="error"] {
+  color: var(--miss);
+}
+.score-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+.score {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+}
+.verdict {
+  font-weight: 600;
+}
+.job {
+  color: var(--mute);
+}
+.note {
+  margin: 10px 0 0;
+  color: var(--mute);
+  font-size: 12px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+.chip.hit {
+  border-color: var(--hit);
+  color: var(--hit);
+}
+.chip.miss {
+  border-color: var(--miss);
+  color: var(--miss);
+}
+.none {
+  color: var(--mute);
+}
+.tips {
+  margin: 0;
+  padding-left: 18px;
+}
+.tips li {
+  margin-bottom: 4px;
+}

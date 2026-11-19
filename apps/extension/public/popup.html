@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waypoint</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Waypoint</h1>
+      <p class="tag">Score this posting against your resume. Everything stays on this device.</p>
+    </header>
+
+    <label for="resume">Your resume (plain text)</label>
+    <textarea
+      id="resume"
+      rows="6"
+      spellcheck="false"
+      placeholder="Paste your resume text here"
+    ></textarea>
+    <div class="row">
+      <button id="save" type="button" class="ghost">Save resume</button>
+      <button id="score" type="button" class="primary">Score this page</button>
+    </div>
+
+    <p id="status" role="status" aria-live="polite"></p>
+    <div id="output"></div>
+    <button id="letter" type="button" class="ghost" hidden>Copy cover letter draft</button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

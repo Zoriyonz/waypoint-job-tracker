@@ -1,0 +1,29 @@
+{
+  "name": "@waypoint/extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Manifest V3 browser extension that scores the job posting you are viewing against your resume.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "eslint",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@waypoint/ai": "workspace:*",
+    "@waypoint/match-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "@types/chrome": "^0.3.7",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.0",
+    "eslint": "^9",
+    "globals": "^17.0.0",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.40.0",
+    "vitest": "^3.2.0"
+  }
+}
